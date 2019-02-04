@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@color/primaryDarkColor"
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <ImageView
+            android:src="@drawable/placehold"
+            android:id="@+id/iv_apod_info"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:layout_marginBottom="10dp"
+            android:scaleType="centerCrop"/>
+        <TextView
+            android:id="@+id/tv_apodcopyright"
+            android:padding="11dp"
+            android:background="@color/primaryLightColor"
+            android:layout_margin="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="22sp" />
+        <TextView
+            android:id="@+id/tv_apodexplan"
+            android:padding="10dp"
+            android:background="@color/primaryLightColor"
+            android:layout_margin="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="18sp" />
+
+
+    </LinearLayout>
+</ScrollView>

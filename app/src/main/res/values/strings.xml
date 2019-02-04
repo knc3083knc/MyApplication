@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">My Application</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="login_btn">LogIn</string>
+    <string name="noacc">No accounts yet? Create one</string>
+    <string name="fname">First Name</string>
+    <string name="lname">Last Name</string>
+    <string name="signup">SignUp</string>
+    <string name="openmenu">OpenMenu</string>
+    <string name="closemenu">CloseMenu</string>
+    <string name="apod">APOD</string>
+</resources>
