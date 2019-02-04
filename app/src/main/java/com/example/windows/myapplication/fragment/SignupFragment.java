@@ -133,7 +133,7 @@ public class SignupFragment extends Fragment {
                         user.put("last", editLname.getText().toString().trim());
                         user.put("pass", editPass.getText().toString().trim());
 
-                        db.collection("users")
+                        db.collection(editEmail.getText().toString().trim())
                                 .add(user)
                                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                     @Override
