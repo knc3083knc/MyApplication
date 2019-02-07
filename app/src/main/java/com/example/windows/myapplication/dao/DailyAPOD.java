@@ -15,7 +15,17 @@ public class DailyAPOD implements Parcelable {
     @SerializedName("service_version") private String serviceVersion;
     @SerializedName("title") private String title;
     @SerializedName("url") private String url;
-
+    public DailyAPOD()
+    {
+        copyright = "Default";
+        date = "Default";
+        explanation = "IF time out or cant connect will go to https://apod.nasa.gov/apod/image/1902/FoxFur_new_color_2048px.jpg for default ";
+        hdUrl = "https://apod.nasa.gov/apod/image/1902/FoxFur_new_color_2048px.jpg";
+        url = "https://apod.nasa.gov/apod/image/1902/FoxFur_25percent.jpg";
+        mediaType="image";
+        serviceVersion= "v1";
+        title = "Fox Fur, Unicorn, and Christmas Tree";
+    }
     protected DailyAPOD(Parcel in) {
         copyright = in.readString();
         date = in.readString();

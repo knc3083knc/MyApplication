@@ -6,6 +6,10 @@
         android:icon="@mipmap/rocket"
         android:title="@string/apod" />
     <item
+        android:id="@+id/itemFavMusic"
+        android:icon="@mipmap/musicicon"
+        android:title="@string/favMusic" />
+    <item
         android:id="@+id/item2"
         android:icon="@drawable/icon"
         android:title="Test2" />

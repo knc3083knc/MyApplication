@@ -5,6 +5,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.desarrollodroide.libraryfragmenttransactionextended.FragmentTransactionExtended;
 import com.example.windows.myapplication.R;
@@ -30,7 +31,6 @@ public class LoginActivity extends AppCompatActivity implements LoginFragment.On
     public void onCreateAccClicked(boolean clicked) {
         if(clicked)
         {
-
             getSupportFragmentManager().beginTransaction()
                     .addToBackStack(null)
                     .replace(R.id.login_container,SignupFragment.newInstance())

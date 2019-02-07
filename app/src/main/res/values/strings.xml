@@ -10,4 +10,5 @@
     <string name="openmenu">OpenMenu</string>
     <string name="closemenu">CloseMenu</string>
     <string name="apod">APOD</string>
+    <string name="favMusic">Favorite Music</string>
 </resources>

@@ -11,6 +11,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -18,13 +20,25 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.windows.myapplication.R;
+import com.example.windows.myapplication.dao.AppProfile;
 import com.example.windows.myapplication.dao.DailyAPOD;
+import com.example.windows.myapplication.fragment.FavMusicAddFragment;
+import com.example.windows.myapplication.fragment.FavMusicFragment;
 import com.example.windows.myapplication.fragment.Fragment2;
 import com.example.windows.myapplication.fragment.LoginFragment;
 import com.example.windows.myapplication.fragment.MainFragment;
 import com.example.windows.myapplication.manager.ApiService;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -38,24 +52,25 @@ public class MainActivity extends AppCompatActivity {
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle actionBarDrawerToggle;
     TextView tvTest;
-    FirebaseAuth firebaseAuth;
     ProgressBar pbApod;
     ApiService apiService;
     Retrofit retrofit;
     DailyAPOD apod;
     NavigationView navigationView;
 
+    FirebaseAuth firebaseAuth;
+    FirebaseFirestore firebaseFirestore;
+
+    boolean mState = false; // setting state
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        firebaseAuth = FirebaseAuth.getInstance();
-        tvTest = (TextView) findViewById(R.id.tvTest);
         init();
 
         if (firebaseAuth.getCurrentUser() != null) {
             tvTest.setText("WELCOME ! \n" + firebaseAuth.getCurrentUser().getEmail());
-            getSupportActionBar().setTitle(R.string.apod);
         }
 
         if (savedInstanceState == null) {
@@ -72,10 +87,18 @@ public class MainActivity extends AppCompatActivity {
                 public void onResponse(Call<DailyAPOD> call, Response<DailyAPOD> response) {
                     apod = response.body();
                     pbApod.setVisibility(View.GONE);
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.main_container, MainFragment.newInstance(apod))
+                            .commit();
                 }
 
                 @Override
                 public void onFailure(Call<DailyAPOD> call, Throwable t) {
+                    pbApod.setVisibility(View.GONE);
+                    apod = new DailyAPOD();
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.main_container, MainFragment.newInstance(apod))
+                            .commit();
                     Toast.makeText(MainActivity.this, t.getMessage().toString(), Toast.LENGTH_LONG).show();
                 }
             });
@@ -87,7 +110,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void init() {
+        firebaseAuth = FirebaseAuth.getInstance();
 
+        firebaseFirestore = FirebaseFirestore.getInstance();
+        DocumentReference documentReference = firebaseFirestore.collection("AppProfile")
+                .document(firebaseAuth.getCurrentUser().getEmail());
+
+        documentReference.get()
+                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+
+                        AppProfile profile = documentSnapshot.toObject(AppProfile.class);
+                        Log.d("AppProfile", profile.getFname() + "\n" + profile.getLname());
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d("AppProfile", e.getMessage().toString());
+
+                    }
+                });
+
+        tvTest = (TextView) findViewById(R.id.tvTest);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -106,16 +152,24 @@ public class MainActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 item.setCheckable(true);
                 drawerLayout.closeDrawers();
-                if(item.getItemId() == R.id.itemApod)
-                {
+                if (item.getItemId() == R.id.itemApod) {
+                    mState = false;
+                    invalidateOptionsMenu();
+                    getSupportActionBar().setTitle(R.string.apod);
+                    invalidateOptionsMenu();
                     getSupportFragmentManager().beginTransaction()
                             .replace(R.id.main_container, MainFragment.newInstance(apod))
                             .commit();
-                }
-                else if(item.getItemId() == R.id.item2)
-                {
+                } else if (item.getItemId() == R.id.item2) {
                     getSupportFragmentManager().beginTransaction()
                             .replace(R.id.main_container, Fragment2.newInstance())
+                            .commit();
+                } else if (item.getItemId() == R.id.itemFavMusic) {
+                    mState = true;
+                    invalidateOptionsMenu();
+                    getSupportActionBar().setTitle(R.string.favMusic);
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.main_container, FavMusicFragment.newInstance())
                             .commit();
                 }
                 return true;
@@ -136,9 +190,31 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.favmusic_menu, menu);
+
+        if (!mState)
+        {
+            for (int i = 0; i < menu.size(); i++)
+                menu.getItem(i).setVisible(false);
+        }
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Log.d("MenuItemClicked","ID :"+item.getTitle() +" ID2: "+R.id.itemFavMusic);
         if (actionBarDrawerToggle.onOptionsItemSelected(item)) {
             return true;
+        }
+        else if(item.getTitle().equals("Add Fav Music"))
+        {
+            getSupportFragmentManager().beginTransaction()
+                    .addToBackStack(null)
+                    .replace(R.id.main_container, FavMusicAddFragment.newInstance())
+                    .commit();
+            return  true;
         }
         return super.onOptionsItemSelected(item);
     }

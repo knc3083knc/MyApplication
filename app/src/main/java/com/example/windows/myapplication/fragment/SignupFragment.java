@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.windows.myapplication.R;
+import com.example.windows.myapplication.dao.AppProfile;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.AuthResult;
@@ -128,25 +129,12 @@ public class SignupFragment extends Fragment {
                 .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                     @Override
                     public void onSuccess(AuthResult authResult) {
-                        Map<String, Object> user = new HashMap<>();
-                        user.put("first", editFname.getText().toString().trim());
-                        user.put("last", editLname.getText().toString().trim());
-                        user.put("pass", editPass.getText().toString().trim());
-
-                        db.collection(editEmail.getText().toString().trim())
-                                .add(user)
-                                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                    @Override
-                                    public void onSuccess(DocumentReference documentReference) {
-                                        Log.d("SignUpStatus", "DocumentSnapshot added with ID: " + documentReference.getId());
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Log.w("SignUpStatus", "Error adding document", e);
-                                    }
-                                });
+                        AppProfile profile = new AppProfile();
+                        profile.setEmail(editEmail.getText().toString().trim());
+                        profile.setPass(editPass.getText().toString().trim());
+                        profile.setFname(editFname.getText().toString().trim());
+                        profile.setLname(editLname.getText().toString().trim());
+                        db.collection("AppProfile").document(editEmail.getText().toString().trim()).set(profile);
                         onSignup.onSignupSuccess(true);
                     }
                 })
